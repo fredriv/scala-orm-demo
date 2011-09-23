@@ -11,10 +11,10 @@ import org.squeryl.annotations.Column
 import org.squeryl.dsl.OneToMany
 import org.squeryl.dsl.ManyToOne
 
-class Author(val id: Long,
+class Author(val id: Int,
 	     val firstName: String,
 	     val lastName: String,
-	     val email: Option[String]) extends KeyedEntity[Long] {
+	     val email: Option[String]) extends KeyedEntity[Int] {
 
   // no-arg constructor required for classes with Option[] fields
   def this() = this(0, "", "", Some(""))
@@ -22,9 +22,9 @@ class Author(val id: Long,
   lazy val books: OneToMany[Book] = SquerylLibrary.authorToBooks.left(this)
 }
 
-class Book(val id: Long,
+class Book(val id: Int,
 	   var title: String,
-	   @Column(name = "author_id") var authorId: Long) extends KeyedEntity[Long] {
+	   @Column(name = "author_id") var authorId: Int) extends KeyedEntity[Int] {
 
   lazy val author: ManyToOne[Author] = SquerylLibrary.authorToBooks.right(this)
 }

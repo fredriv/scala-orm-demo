@@ -95,4 +95,19 @@ class SquerylLibraryTest extends FlatSpec with ShouldMatchers with Assertions {
     }
   }
 
+  it should "find all books for all authors" in {
+    transaction {
+      val allAuthors = from (authors) { a => select(a) }
+      def booksByAuthor(authorId: Int) = from (books) { b => where(b.authorId === authorId) select(b) }
+
+      val booksPerAuthor: List[(Author, List[Book])] = 
+	(for (a <- allAuthors) yield {
+	  (a, booksByAuthor(a.id).toList)
+	}).toList
+
+      booksPerAuthor should have length 4
+    }
+  }
+
+
 }
