@@ -91,4 +91,37 @@ class ScalaQueryLibraryTest extends FlatSpec with ShouldMatchers with Assertions
     }
   }
 
+  it should "find all books for all authors" in {
+    db withSession {
+      val authors = (for (a <- Authors) yield a).list
+
+      val booksPerAuthor: List[(Author, List[Book])] = 
+	for (a <- authors) yield {
+	  val books = (for (b <- Books 
+			    if b.authorId === a.id) 
+		       yield b).list
+	  (a, books)
+	}
+
+      booksPerAuthor should have length 4
+    }
+  }
+
+  it should "find all books for all authors 2" in {
+    db withSession {
+      val authors = (for (a <- Authors) yield a).list
+      val allBooks = (for (b <- Books) yield b).list
+
+      val booksPerAuthor: List[(Author, List[Book])] = 
+	for (a <- authors) yield {
+	  val books = for (b <- allBooks 
+			   if b.authorId == a.id) 
+		      yield b
+	  (a, books)
+	}
+
+      booksPerAuthor should have length 4
+    }
+  }
+
 }
