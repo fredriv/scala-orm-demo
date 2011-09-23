@@ -37,7 +37,7 @@ class SquerylLibraryTest extends FlatSpec with ShouldMatchers with Assertions {
   it should "not register multiple books with the same title" in {
     evaluating {
       transaction {
-        books.insert(new Book(0, "Coraline", 3))
+        books.insert(new Book(4, "Coraline", 3))
       }
     } should produce[Exception]
   }
@@ -45,7 +45,7 @@ class SquerylLibraryTest extends FlatSpec with ShouldMatchers with Assertions {
   it should "not register books to authors that do not exist" in {
     evaluating {
       transaction {
-        books.insert(new Book(0, "Test", 0))
+        books.insert(new Book(5, "Test", 0))
       }
     } should produce[Exception]
   }
@@ -80,6 +80,7 @@ class SquerylLibraryTest extends FlatSpec with ShouldMatchers with Assertions {
   it should "have books for authors" in {
     transaction {
       val a = findAuthorByName("Neil", "Gaiman")
+      a should not be (None)
       val books = a.get.books
       books find(_.title == "Coraline") should not equal(None)
     }
@@ -88,6 +89,7 @@ class SquerylLibraryTest extends FlatSpec with ShouldMatchers with Assertions {
   it should "find books for authors" in {
     transaction {
       val a = findAuthorByName("Neil", "Gaiman")
+      a should not be (None)
       val books = findBooksByAuthor(a.get)
       books find(_.title == "Coraline") should not equal(None)
     }

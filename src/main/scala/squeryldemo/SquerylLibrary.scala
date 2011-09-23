@@ -24,25 +24,25 @@ class Author(val id: Long,
 
 class Book(val id: Long,
 	   var title: String,
-	   @Column(name = "AUTHOR_ID") var authorId: Long) extends KeyedEntity[Long] {
+	   @Column(name = "author_id") var authorId: Long) extends KeyedEntity[Long] {
 
   lazy val author: ManyToOne[Author] = SquerylLibrary.authorToBooks.right(this)
 }
 
 object SquerylLibrary extends Schema {
 
-  val authors = table[Author]("AUTHORS")
+  val authors = table[Author]("SQUERYL_AUTHORS")
 
-  val books = table[Book]("BOOKS")
+  val books = table[Book]("SQUERYL_BOOKS")
 
   on(authors)(a => declare(
-    a.email is (indexed("idxEmailAddresses")),
+    a.email is (indexed("squerylEmailIdx")),
     a.firstName is (indexed),
     a.lastName is (indexed),
     columns(a.firstName, a.lastName) are (indexed)))
 
   on(books)(b => declare(
-    b.title is (unique, indexed("idxBookTitles"), dbType("varchar(255)"))))
+    b.title is (unique, indexed("squerylTitleIdx"), dbType("varchar(255)"))))
 
   // TODO: Set up relationship between book and author
   val authorToBooks =
@@ -57,7 +57,8 @@ object SquerylLibrary extends Schema {
     from(authors)(a => where(a.email === Some(email)) select (a)).headOption
 
   // TODO: Set up query for books by author
-  def findBooksByAuthor(author: Author): List[Book] = Nil
+  def findBooksByAuthor(author: Author): List[Book] = 
+    from(books)(b => where(b.authorId === author.id) select(b)).toList
 
   def init = {
     Class.forName("org.apache.derby.jdbc.EmbeddedDriver")
